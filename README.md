@@ -1,15 +1,13 @@
 # FortiDig
 
-FortiDig is a Python-based log analysis tool designed for parsing and analyzing Fortigate firewall logs. It offers functionalities to perform hourly analysis, event type analysis, and intrusion checks based on predefined patterns associated with known CVEs.
+FortiDig is a Python-based log analysis tool designed for parsing and analyzing Fortigate firewall logs. It offers functionalities to perform intrusion checks based on predefined patterns associated with known CVEs.
 
 ## Version
 
-1.0.0
+1.0.2
 
 ## Features
 
-- **Hourly Analysis**: Counts the number of log events per hour.
-- **Event Analysis**: Aggregates the log events based on their types.
 - **Intrusion Check**: Scans the logs for patterns that may indicate a potential intrusion, focusing on specific CVEs.
 
 ## Requirements
@@ -31,6 +29,7 @@ FortiDig currently checks for intrusions based on the following CVEs:
 - CVE-2022-40684
 - CVE-2022-41328
 - CVE-2022-42475
+- CVE-2024-55591
 
 ## Contributing
 
