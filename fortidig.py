@@ -8,7 +8,7 @@ def compile_patterns():
         "CVE-2022-40684": re.compile(r'user="Local_Process_Access"'),
         "CVE-2022-41328": re.compile(r'execute wireless-controller hs20-icon upload-icon'),
         "CVE-2022-42475": re.compile(r'logdesc="Application crashed".*msg=".*application:sslvpnd,.*Signal 11 received, Backtrace:.*"', re.DOTALL),
-        "CVE-2024-55591": re.compile(r'logdesc="Admin login successful".*ui="jsconsole".*srcip=(\d+\.\d+\.\d+\.\d+).*dstip=\1.*action="login".*status="success"'),
+        "CVE-2024-55591": re.compile(r'logdesc="Admin login successful".*ui="jsconsole".*srcip=(\d+\.\d+\.\d+\.\d+).*dstip=\1.*action="login".*status="success"')
     }
 
 def intrusion_check(log_lines):
