@@ -8,56 +8,41 @@ def compile_patterns():
         "CVE-2022-40684": re.compile(r'user="Local_Process_Access"'),
         "CVE-2022-41328": re.compile(r'execute wireless-controller hs20-icon upload-icon'),
         "CVE-2022-42475": re.compile(r'logdesc="Application crashed".*msg=".*application:sslvpnd,.*Signal 11 received, Backtrace:.*"', re.DOTALL),
+        "CVE-2024-55591": re.compile(r'logdesc="Admin login successful".*ui="jsconsole".*srcip=(\d+\.\d+\.\d+\.\d+).*dstip=\1.*action="login".*status="success"'),
     }
-
-def hourly_analysis(log_lines):
-    hourly_event_counts = Counter()
-    for line in log_lines:
-        date_time_search = re.search(r'date=(.*?) time=(.*?) ', line)
-        if date_time_search:
-            date_time_str = f"{date_time_search.group(1)} {date_time_search.group(2)}"
-            log_datetime = datetime.strptime(date_time_str, '%Y-%m-%d %H:%M:%S')
-            hour = log_datetime.strftime('%Y-%m-%d %H:00')
-            hourly_event_counts[hour] += 1
-    for hour, count in sorted(hourly_event_counts.items()):
-        print(f"{hour}: {count} events")
-    print("--------------------------------------------------")
-
-def event_analysis(log_lines):
-    event_type_counts = Counter()
-    for line in log_lines:
-        action_search = re.search(r'action="(.*?)"', line)
-        if action_search:
-            event_type = action_search.group(1)
-            event_type_counts[event_type] += 1
-    for event_type, count in event_type_counts.items():
-        print(f"{event_type}: {count} events")
-    print("--------------------------------------------------")
 
 def intrusion_check(log_lines):
     patterns = compile_patterns()
     found_cves = {}
+    found_logs = {}
+
     for line in log_lines:
         for cve, pattern in patterns.items():
             if pattern.search(line):
                 found_cves.setdefault(cve, 0)
                 found_cves[cve] += 1
+                found_logs.setdefault(cve, []).append(line.strip())
+
     if found_cves:
         for cve, count in found_cves.items():
             print(f"\033[91mWarning: Possible intrusion detected due to {cve}. Detected in {count} lines.\033[0m")
+            print("Matching logs:")
+            for log in found_logs[cve]:
+                print(f"  {log}")
+            print("--------------------------------------------------")
     else:
         print("No signs of specified intrusions detected.")
-    print("--------------------------------------------------")
+        print("--------------------------------------------------")
 
 def display_menu(first_time=True):
     if first_time:
         print("""
         ###############################################
         #             Fortigate Log Digger            #
-        #                 Version: 1.0.0               #
+        #                 Version: 1.0.2              #
         ###############################################
         """)
-    print("Select the function:\n0. Exit\n1. Hourly Analysis\n2. Event Analysis\n3. Intrusion Check\n")
+    print("Select the function:\n0. Exit\n1. Intrusion Check\n")
 
 def main(log_file_path):
     try:
@@ -74,16 +59,12 @@ def main(log_file_path):
     while True:
         display_menu(first_time)
         first_time = False
-        choice = input("Enter your choice (0-3): ")
+        choice = input("Enter your choice (0-1): ")
         print("")  
         if choice == '0':
             print("Exiting program.")
             break
         elif choice == '1':
-            hourly_analysis(log_lines)
-        elif choice == '2':
-            event_analysis(log_lines)
-        elif choice == '3':
             intrusion_check(log_lines)
         else:
             print("Invalid choice. Please try again.")
